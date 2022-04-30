@@ -17,53 +17,28 @@ import neopixel
 import time
 
 
-def extractSnipROI(image,windowSize):
+def extractROI(image,windowSize):
     roiImage=image[:windowSize[0],:windowSize[1],:]
-    print ("roiImage", len(roiImage))
     return roiImage
 
-def extractROI(image,xCenter,yCenter,windowSize):
-    
-#     print ("extractROI", xCenter,yCenter,windowSize)
-    
-    x_startIdx=int(xCenter-windowSize[0]/2)
-    y_startIdx=int(yCenter-windowSize[1]/2)
-    x_endIdx=int(xCenter+windowSize[0]/2)
-    y_endIdx=int(yCenter+windowSize[1]/2)
-    
-#     x_startIdx=x_startIdx if x_startIdx>16 else 17
-#     x_endIdx=x_endIdx if x_endIdx<118 else 117
-    print ("extractROI xy", x_startIdx, y_startIdx, x_endIdx, y_endIdx, x_endIdx-x_startIdx, y_endIdx-y_startIdx)
-    
-    roiImage=image[x_startIdx:x_endIdx,y_startIdx:y_endIdx,:]
-    
-    print ("roiImage", len(roiImage))
 
-    return roiImage
+def imageToLED(discreteImageRaw,pixels):
 
-def discretizeImage(image,noLevels):
+    pixelArray=np.zeros((len(discreteImageRaw),3))
 
-    normalizedImage=image/255
-    discretizedImage=np.floor(normalizedImage*noLevels).astype(int)
-    multiplier=255/noLevels
-    discretizedImage=np.floor(discretizedImage*multiplier).astype(np.uint8) #Rescale to range 0-255
-    return discretizedImage
+    discreteImage0=discreteImageRaw[:,:,0]
+    discreteImage0=discreteImage0.flatten()
+    pixelArray[:,0]=discreteImage0
+    discreteImage1=discreteImageRaw[:,:,1]
+    discreteImage1=discreteImage1.flatten()
+    pixelArray[:,1]=discreteImage1
+    discreteImage2=discreteImageRaw[:,:,2]
+    discreteImage2=discreteImage2.flatten()
+    pixelArray[:,2]=discreteImage2
 
-def imageToLED(discreteImageRaw,pixels,colorVal):
-    
-    print ("discreteImageRaw", discreteImageRaw, len(discreteImageRaw))
-    discreteImage=discreteImageRaw[:,:,1]
-    discreteImage=discreteImage.flatten()
-    print ("discreteImage", discreteImage, len(discreteImage))
-    pixelArray=np.zeros((len(discreteImage),3))
-    print ("lens", len(discreteImage), len(pixelArray), len(pixels))
-    pixelArray[:,colorVal]=discreteImage
-#     print ("pixelArray", pixelArray, discreteImage)
     pixelArray=pixelArray.astype(int) # Convert to int
     pixelTuple=[tuple(x) for x in pixelArray] #Convert to correctly dimensioned tuple array
     pixels[:]=pixelTuple
-    print ("pixelTuple", pixelTuple)
-    print ("pixels", pixels)
         
     return pixels
     
@@ -79,8 +54,6 @@ yCenter=75#71 #y center location of ROI
 thresh=50 #Threshold value for background subtraction
 threshLower=0
 threshUpper=200
-
-colorVal=0 #R=0, G=1, B=2
 
 pixelPin=board.D18
 numPixels=numNeopixels_x*numNeopixels_y
@@ -118,12 +91,8 @@ rawCapture.truncate(0) #Clear buffer for next frame capture
 while 1:
     camera.capture(rawCapture,format="rgb",use_video_port=True) #Capture image
     newImage=rawCapture.array #Retrieve array of captured image as array
-#     newImageROI = extractROI(newImage,xCenter,yCenter,windowSize) #Extract base image ROI
-    newImageROI = extractSnipROI(newImage,windowSize)
-#    discretizedImage=discretizeImage(newImageROI,noLevels) #Discretize image and scale values   
-    #pixels=imageToLED(discretizedImage,pixels,colorVal) #Convert the image to an LED value array and assign them to the string of Neopixels
-#    print ("len newImageROI", newImageROI, len(newImageROI))
-    pixels=imageToLED(newImageROI,pixels,colorVal) #Convert the image to an LED value array and assign them to the string of Neopixels
+    newImageROI = extractROI(newImage,windowSize)
+    pixels=imageToLED(newImageROI,pixels) #Convert the image to an LED value array and assign them to the string of Neopixels
     pixels.show() #Light up the LEDs
     rawCapture.truncate(0) #Clear stream to prepare for next frame
 
