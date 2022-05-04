@@ -53,10 +53,10 @@ def imageToLED(discreteImageRaw,pixels):
 logging.basicConfig(level=logging.DEBUG)
 
 #Parameters
-xImageRes=160 #Desired x resolution of captured image
-yImageRes=150 #120 #Desired y resolution of captured image
+xImageRes=300 #Desired x resolution of captured image
+yImageRes=300 #120 #Desired y resolution of captured image
 noLevels=255 #No of LED brightness discretization levels
-numNeopixels_x = 150 #Declare number of Neopixels in grid
+numNeopixels_x = 300 #Declare number of Neopixels in grid
 numNeopixels_y = 1
 windowSize=(numNeopixels_x,numNeopixels_y) #Define extracted ROI size
 xCenter=67#70 #x center location of ROI
@@ -70,27 +70,29 @@ numPixels=numNeopixels_x*numNeopixels_y
 colorOrder = neopixel.GRB
 #pixels = neopixel.NeoPixel(pixelPin, numPixels, auto_write=False, pixel_order=colorOrder)
 
-pixels = neopixel.NeoPixel(pixelPin, numPixels)
+pixels = neopixel.NeoPixel(pixelPin, numPixels, brightness = 0.2)
 
+logging.debug('numPixels') 
+logging.debug(numPixels)
 
 #Initialize camera and fix settings
 camera = PiCamera()
 camera.resolution=(xImageRes,yImageRes)
-camera.framerate=30
+# camera.framerate=30
 rawCapture = PiRGBArray(camera, size=(xImageRes,yImageRes))
-#camera.vflip=True
-#camera.color_effects=(128,128) #Grayscale
-camera.contrast=100 #Contrast
-camera.brightness=10 #Brightness
-camera.iso = 600
-camera.meter_mode = 'matrix'
-sleep(2)
-camera.shutter_speed = camera.exposure_speed
-camera.exposure_mode = 'off'
-g = camera.awb_gains
-camera.awb_mode = 'off'
-camera.awb_gains = g
-sleep(1) #allow the camera to warm up
+# #camera.vflip=True
+# #camera.color_effects=(128,128) #Grayscale
+# camera.contrast=100 #Contrast
+# camera.brightness=1 #Brightness
+# camera.iso = 600
+# camera.meter_mode = 'matrix'
+# sleep(2)
+# camera.shutter_speed = camera.exposure_speed
+# camera.exposure_mode = 'off'
+# g = camera.awb_gains
+# camera.awb_mode = 'off'
+# camera.awb_gains = g
+# sleep(1) #allow the camera to warm up
 
 
 #Capture and process image
