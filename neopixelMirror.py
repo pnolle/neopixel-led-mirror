@@ -15,10 +15,17 @@ import numpy as np
 import board
 import neopixel
 import time
+import logging
 
 
 def extractROI(image,windowSize):
     roiImage=image[:windowSize[0],:windowSize[1],:]
+    logging.debug('extractROI') 
+    logging.debug(windowSize)
+    logging.debug(len(image))
+    logging.debug(len(image[0]))
+    logging.debug(len(roiImage))
+    logging.debug(len(roiImage[0]))
     return roiImage
 
 
@@ -42,6 +49,9 @@ def imageToLED(discreteImageRaw,pixels):
         
     return pixels
     
+
+logging.basicConfig(level=logging.DEBUG)
+
 #Parameters
 xImageRes=160 #Desired x resolution of captured image
 yImageRes=150 #120 #Desired y resolution of captured image
