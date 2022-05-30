@@ -28,10 +28,10 @@ def extractROI(image,windowSize):
 def discretizeImage(image,noLevels):
 
     normalizedImage=image/255
-    # logging.debug('discretizeImage \n--- image {}\n--- image[0] {}\n--- image[0,0] {}'.format(image, image[0], image[0,0])) 
     discretizedImage=np.floor(normalizedImage*noLevels).astype(int)
     multiplier=255/noLevels
     discretizedImage=np.floor(discretizedImage*multiplier).astype(np.uint8) #Rescale to range 0-255
+    logging.debug('discretizeImage \n--- image[:,:,0] {}\n--- normalizedImage {}'.format(image[:,:,0], normalizedImage)) 
     return discretizedImage
 
 
