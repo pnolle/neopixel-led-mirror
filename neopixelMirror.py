@@ -22,10 +22,6 @@ import logging
 
 def extractROI(image,windowSize):
     roiImage=image[:windowSize[0],:windowSize[1],:]
-    # logging.debug('extractROI image.shape {} {} {}'.format(image.shape[0], image.shape[1], image.shape[2])) 
-    # logging.debug('\nextractROI {}\n{}\n-----------------------\n{}'.format(windowSize, image, roiImage)) 
-    # logging.debug('####\nimage0 {} / image1 {} => len(image) {}'.format(image[0], image[1], len(image)))
-    # logging.debug('####\nroiImage0 {} / roiImage1 {} => len(roiImage) {}'.format(roiImage[0], roiImage[1], len(roiImage)))
     return roiImage
 
 
@@ -39,7 +35,7 @@ def discretizeImage(image,noLevels):
     return discretizedImage
 
 
-def imageToLEDNoColor(discreteImageRaw,pixels):
+def imageToLED(discreteImageRaw,pixels):
 
     pixelArray=np.zeros((len(discreteImageRaw),3))
 
@@ -52,42 +48,15 @@ def imageToLEDNoColor(discreteImageRaw,pixels):
     discreteImage2=discreteImageRaw[:,:,2]
     discreteImage2=discreteImage2.flatten()
     pixelArray[:,2]=discreteImage2
-
-    pixelArray=pixelArray.astype(int) # Convert to int
-    pixelTuple=[tuple(x) for x in pixelArray] #Convert to correctly dimensioned tuple array
-    pixels[:]=pixelTuple
-        
-    return pixels
-
-def imageToLED(discreteImageRaw,pixels,colorVal):
-
-    pixelArray=np.zeros((len(discreteImageRaw),3))
-
-    discreteImage0=discreteImageRaw[:,:,0]
-    discreteImage0=discreteImage0.flatten()
-    pixelArray[:,0]=discreteImage0
-    discreteImage1=discreteImageRaw[:,:,1]
-    discreteImage1=discreteImage1.flatten()
-    pixelArray[:,1]=discreteImage1
-    discreteImage2=discreteImageRaw[:,:,2]
-    discreteImage2=discreteImage2.flatten()
-    pixelArray[:,2]=discreteImage2
-    
-    # discreteImage=discreteImageRaw[:,:,1]   # gets color value
-    # discreteImage=discreteImage.flatten()
-    # pixelArray[:,colorVal]=discreteImage    # puts it into <colorVal> channel (e.g. 2 = Blue)
-
 
     logging.debug('imageToLED \n--- len(pixelArray) {}\n--- pixelArray[0] {}'.format(len(pixelArray), pixelArray[0]))
-    # print(C().b_rgb(0,0,0).rgb(255,150,0, 'Hello there'))
+    
     pixelArray=pixelArray.astype(int) # Convert to int
     pixelTuple=[tuple(x) for x in pixelArray] #Convert to correctly dimensioned tuple array
     pixels[:]=pixelTuple
-
-    # logging.debug('imageToLED \n--- discreteImage\n{}\n--- pixelArray\n{}\n--- pixelTuple\n{}\n--- pixels\n{}'.format(discreteImage,pixelArray,pixelTuple,pixels)) 
         
     return pixels
-    
+
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -139,26 +108,12 @@ rawCapture = PiRGBArray(camera, size=(xImageRes,yImageRes))
 camera.capture(rawCapture,format="rgb",use_video_port=True) #Capture image
 rawCapture.truncate(0) #Clear buffer for next frame capture
 
-# image = rawCapture.array
-# logging.debug('image {}'.format(image.shape)) 
-# roiImage=image[:windowSize[0],:windowSize[1]]
-# arri = np.array([[1,2,3,4,5], [5,6,7,8,9]])
-# logging.debug('roiImage {}'.format(roiImage.shape)) 
-# logging.debug('image.shape012 {} {} {}'.format(image.shape[0], image.shape[1], image.shape[2])) 
-
-# newImageROI = extractROI(image,windowSize)
-# pixels=imageToLED(newImageROI,pixels) #Convert the image to an LED value array and assign them to the string of Neopixels
-# pixels.show() #Light up the LEDs
-
-
-
 while 1:
     camera.capture(rawCapture,format="rgb",use_video_port=True) #Capture image
     newImage=rawCapture.array #Retrieve array of captured image as array
     newImageROI = extractROI(newImage,windowSize)
     discretizedImage=discretizeImage(newImageROI,noLevels) #Discretize image and scale values  
-    pixels=imageToLED(discretizedImage,pixels,colorVal) #Convert the image to an LED value array and assign them to the string of Neopixels
-    # pixels=imageToLEDNoColor(discretizedImage,pixels) #Convert the image to an LED value array and assign them to the string of Neopixels
+    pixels=imageToLED(discretizedImage,pixels) #Convert the image to an LED value array and assign them to the string of Neopixels
     pixels.show() #Light up the LEDs
     rawCapture.truncate(0) #Clear stream to prepare for next frame
 
