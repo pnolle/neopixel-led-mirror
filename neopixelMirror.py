@@ -36,21 +36,22 @@ def discretizeImage(image,noLevels):
 
 
 def imageToLED(discreteImageRaw,pixels):
+    
+    discreteImage=discreteImageRaw[:,:,0]
+    discreteImage=discreteImage.flatten()
+    pixelArray=np.zeros((len(discreteImage),3))
+    pixelArray[:,0]=discreteImage
 
-    pixelArray=np.zeros((len(discreteImageRaw),3))
+    discreteImage=discreteImageRaw[:,:,1]
+    discreteImage=discreteImage.flatten()
+    pixelArray[:,1]=discreteImage
 
-    discreteImage0=discreteImageRaw[:,:,0]
-    discreteImage0=discreteImage0.flatten()
-    pixelArray[:,0]=discreteImage0
-    discreteImage1=discreteImageRaw[:,:,1]
-    discreteImage1=discreteImage1.flatten()
-    pixelArray[:,1]=discreteImage1
-    discreteImage2=discreteImageRaw[:,:,2]
-    discreteImage2=discreteImage2.flatten()
-    pixelArray[:,2]=discreteImage2
+    discreteImage=discreteImageRaw[:,:,2]
+    discreteImage=discreteImage.flatten()
+    pixelArray[:,2]=discreteImage
 
     logging.debug('imageToLED \n--- len(pixelArray) {}\n--- pixelArray[0] {}'.format(len(pixelArray), pixelArray[0]))
-    
+
     pixelArray=pixelArray.astype(int) # Convert to int
     pixelTuple=[tuple(x) for x in pixelArray] #Convert to correctly dimensioned tuple array
     pixels[:]=pixelTuple
@@ -64,8 +65,8 @@ logging.basicConfig(level=logging.DEBUG)
 xImageRes=500 #Desired x resolution of captured image
 yImageRes=500 #120 #Desired y resolution of captured image
 noLevels=255 #No of LED brightness discretization levels
-numNeopixels_x = 500 #Declare number of Neopixels in grid
-numNeopixels_y = 1
+numNeopixels_x = 24 #Declare number of Neopixels in grid
+numNeopixels_y = 24
 windowSize=(numNeopixels_x,numNeopixels_y) #Define extracted ROI size
 xCenter=67#70 #x center location of ROI
 yCenter=75#71 #y center location of ROI
