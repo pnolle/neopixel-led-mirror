@@ -61,10 +61,10 @@ def imageToLED(discreteImageRaw,pixels):
 logging.basicConfig(level=logging.DEBUG)
 
 #Parameters
-xImageRes=400 #Desired x resolution of captured image
-yImageRes=400 #120 #Desired y resolution of captured image
+xImageRes=500 #Desired x resolution of captured image
+yImageRes=500 #120 #Desired y resolution of captured image
 noLevels=255 #No of LED brightness discretization levels
-numNeopixels_x = 400 #Declare number of Neopixels in grid
+numNeopixels_x = 500 #Declare number of Neopixels in grid
 numNeopixels_y = 1
 windowSize=(numNeopixels_x,numNeopixels_y) #Define extracted ROI size
 xCenter=67#70 #x center location of ROI
@@ -101,7 +101,7 @@ rawCapture = PiRGBArray(camera, size=(xImageRes,yImageRes))
 # g = camera.awb_gains
 # camera.awb_mode = 'off'
 # camera.awb_gains = g
-# sleep(1) #allow the camera to warm up
+sleep(1) #allow the camera to warm up
 
 
 #Capture and process image
