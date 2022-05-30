@@ -19,13 +19,14 @@ import logging
 
 
 def extractROI(image,windowSize):
-    roiImage=image[:windowSize[0],:windowSize[1],:]
-    logging.debug('extractROI') 
-    logging.debug(windowSize)
-    logging.debug(len(image))
-    logging.debug(len(image[0]))
-    logging.debug(len(roiImage))
-    logging.debug(len(roiImage[0]))
+    roiImage=image[:windowSize[0],:windowSize[1]]
+
+    arri = np.array([[1,2,3,4,5], [5,6,7,8,9]])
+    logging.debug('#### {}'.format(arri.shape)) 
+    logging.debug('image.shape {} {} {}'.format(image.shape[0], image.shape[1], image.shape[2])) 
+    # logging.debug('\nextractROI {}\n{}\n-----------------------\n{}'.format(windowSize, image, roiImage)) 
+    # logging.debug('####\nimage0 {} / image1 {} => len(image) {}'.format(image[0], image[1], len(image)))
+    # logging.debug('####\nroiImage0 {} / roiImage1 {} => len(roiImage) {}'.format(roiImage[0], roiImage[1], len(roiImage)))
     return roiImage
 
 
@@ -53,10 +54,10 @@ def imageToLED(discreteImageRaw,pixels):
 logging.basicConfig(level=logging.DEBUG)
 
 #Parameters
-xImageRes=300 #Desired x resolution of captured image
-yImageRes=300 #120 #Desired y resolution of captured image
+xImageRes=400 #Desired x resolution of captured image
+yImageRes=400 #120 #Desired y resolution of captured image
 noLevels=255 #No of LED brightness discretization levels
-numNeopixels_x = 300 #Declare number of Neopixels in grid
+numNeopixels_x = 400 #Declare number of Neopixels in grid
 numNeopixels_y = 1
 windowSize=(numNeopixels_x,numNeopixels_y) #Define extracted ROI size
 xCenter=67#70 #x center location of ROI
@@ -72,8 +73,7 @@ colorOrder = neopixel.GRB
 
 pixels = neopixel.NeoPixel(pixelPin, numPixels, brightness = 0.2)
 
-logging.debug('numPixels') 
-logging.debug(numPixels)
+logging.debug('numPixels %d', numPixels) 
 
 #Initialize camera and fix settings
 camera = PiCamera()
@@ -98,6 +98,18 @@ rawCapture = PiRGBArray(camera, size=(xImageRes,yImageRes))
 #Capture and process image
 camera.capture(rawCapture,format="rgb",use_video_port=True) #Capture image
 rawCapture.truncate(0) #Clear buffer for next frame capture
+
+# image = rawCapture.array
+# logging.debug('image {}'.format(image.shape)) 
+# roiImage=image[:windowSize[0],:windowSize[1]]
+# arri = np.array([[1,2,3,4,5], [5,6,7,8,9]])
+# logging.debug('roiImage {}'.format(roiImage.shape)) 
+# logging.debug('image.shape012 {} {} {}'.format(image.shape[0], image.shape[1], image.shape[2])) 
+
+# newImageROI = extractROI(image,windowSize)
+# pixels=imageToLED(newImageROI,pixels) #Convert the image to an LED value array and assign them to the string of Neopixels
+# pixels.show() #Light up the LEDs
+
 
 
 while 1:
