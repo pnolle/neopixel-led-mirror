@@ -30,6 +30,15 @@ def extractROI(image,windowSize):
     return roiImage
 
 
+def discretizeImage(image,noLevels):
+
+    normalizedImage=image/255
+    discretizedImage=np.floor(normalizedImage*noLevels).astype(int)
+    multiplier=255/noLevels
+    discretizedImage=np.floor(discretizedImage*multiplier).astype(np.uint8) #Rescale to range 0-255
+    return discretizedImage
+
+
 def imageToLED(discreteImageRaw,pixels):
 
     pixelArray=np.zeros((len(discreteImageRaw),3))
@@ -116,7 +125,8 @@ while 1:
     camera.capture(rawCapture,format="rgb",use_video_port=True) #Capture image
     newImage=rawCapture.array #Retrieve array of captured image as array
     newImageROI = extractROI(newImage,windowSize)
-    pixels=imageToLED(newImageROI,pixels) #Convert the image to an LED value array and assign them to the string of Neopixels
+    discretizedImage=discretizeImage(newImageROI,noLevels) #Discretize image and scale values  
+    pixels=imageToLED(discretizedImage,pixels) #Convert the image to an LED value array and assign them to the string of Neopixels
     pixels.show() #Light up the LEDs
     rawCapture.truncate(0) #Clear stream to prepare for next frame
 
