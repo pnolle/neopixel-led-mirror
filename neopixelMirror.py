@@ -11,6 +11,8 @@ license: Creative Commons - Attribution - Non Commercial.  More information at: 
 from picamera import PiCamera
 from picamera.array import PiRGBArray
 from time import sleep
+# from colr import color
+# sudo -H pip install colr
 import numpy as np
 import board
 import neopixel
@@ -20,7 +22,7 @@ import logging
 
 def extractROI(image,windowSize):
     roiImage=image[:windowSize[0],:windowSize[1],:]
-    logging.debug('extractROI image.shape {} {} {}'.format(image.shape[0], image.shape[1], image.shape[2])) 
+    # logging.debug('extractROI image.shape {} {} {}'.format(image.shape[0], image.shape[1], image.shape[2])) 
     # logging.debug('\nextractROI {}\n{}\n-----------------------\n{}'.format(windowSize, image, roiImage)) 
     # logging.debug('####\nimage0 {} / image1 {} => len(image) {}'.format(image[0], image[1], len(image)))
     # logging.debug('####\nroiImage0 {} / roiImage1 {} => len(roiImage) {}'.format(roiImage[0], roiImage[1], len(roiImage)))
@@ -30,6 +32,7 @@ def extractROI(image,windowSize):
 def discretizeImage(image,noLevels):
 
     normalizedImage=image/255
+    # logging.debug('discretizeImage \n--- image {}\n--- image[0] {}\n--- image[0,0] {}'.format(image, image[0], image[0,0])) 
     discretizedImage=np.floor(normalizedImage*noLevels).astype(int)
     multiplier=255/noLevels
     discretizedImage=np.floor(discretizedImage*multiplier).astype(np.uint8) #Rescale to range 0-255
@@ -57,14 +60,31 @@ def imageToLEDNoColor(discreteImageRaw,pixels):
     return pixels
 
 def imageToLED(discreteImageRaw,pixels,colorVal):
+
+    pixelArray=np.zeros((len(discreteImageRaw),3))
+
+    discreteImage0=discreteImageRaw[:,:,0]
+    discreteImage0=discreteImage0.flatten()
+    pixelArray[:,0]=discreteImage0
+    discreteImage1=discreteImageRaw[:,:,1]
+    discreteImage1=discreteImage1.flatten()
+    pixelArray[:,1]=discreteImage1
+    discreteImage2=discreteImageRaw[:,:,2]
+    discreteImage2=discreteImage2.flatten()
+    pixelArray[:,2]=discreteImage2
     
-    discreteImage=discreteImageRaw[:,:,1]
-    discreteImage=discreteImage.flatten()
-    pixelArray=np.zeros((len(discreteImage),3))
-    pixelArray[:,colorVal]=discreteImage
+    # discreteImage=discreteImageRaw[:,:,1]   # gets color value
+    # discreteImage=discreteImage.flatten()
+    # pixelArray[:,colorVal]=discreteImage    # puts it into <colorVal> channel (e.g. 2 = Blue)
+
+
+    logging.debug('imageToLED \n--- len(pixelArray) {}\n--- pixelArray[0] {}'.format(len(pixelArray), pixelArray[0]))
+    # print(C().b_rgb(0,0,0).rgb(255,150,0, 'Hello there'))
     pixelArray=pixelArray.astype(int) # Convert to int
     pixelTuple=[tuple(x) for x in pixelArray] #Convert to correctly dimensioned tuple array
     pixels[:]=pixelTuple
+
+    # logging.debug('imageToLED \n--- discreteImage\n{}\n--- pixelArray\n{}\n--- pixelTuple\n{}\n--- pixels\n{}'.format(discreteImage,pixelArray,pixelTuple,pixels)) 
         
     return pixels
     
