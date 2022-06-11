@@ -19,7 +19,6 @@ import neopixel
 import time
 import logging
 
-
 def extractROI(image,windowSize):
     roiImage=image[:windowSize[0],:windowSize[1],:]
     return roiImage
@@ -36,29 +35,49 @@ def discretizeImage(image,noLevels):
 
 
 def imageToLED(discreteImageRaw,pixels):
+    if debugItL: debug(time.perf_counter(), '- imageToLED') 
     
-    discreteImage=discreteImageRaw[:,:,0]
-    discreteImage=discreteImage.flatten()
-    pixelArray=np.zeros((len(discreteImage),3))
-    pixelArray[:,0]=discreteImage
+    discreteImage=discreteImageRaw[:,:,0]       # take element 0/3 from every discreteImageRaw element, 2 levels down
+    discreteImage=discreteImage.flatten()       # image capture comes in single lines, we need everythin in one line for the led strip
+    pixelArray=np.zeros((len(discreteImage),3)) # add one of the inner ones to pixelArray: [[0 0 0] [0 0 0] [0 0 0]]
+    pixelArray[:,0]=discreteImage               # add flattened array to element 0/3, 1 level down
+    if debugItL: debug(time.perf_counter(), '- 0') 
 
     discreteImage=discreteImageRaw[:,:,1]
     discreteImage=discreteImage.flatten()
     pixelArray[:,1]=discreteImage
+    if debugItL: debug(time.perf_counter(), '- 1') 
 
     discreteImage=discreteImageRaw[:,:,2]
     discreteImage=discreteImage.flatten()
     pixelArray[:,2]=discreteImage
+    if debugItL: debug(time.perf_counter(), '- 2') 
 
+    # logging.debug('{} / pixelArray {}'.format(len(discreteImage), pixelArray))
+
+    # logging.debug('x {}'.format(time.perf_counter()))
     # logging.debug('imageToLED pixelArray[0] {}'.format(pixelArray[0]))
     # logging.debug('imageToLED \n--- len(pixelArray) {}\n--- pixelArray[0] {}'.format(len(pixelArray), pixelArray[0]))
 
     pixelArray=pixelArray.astype(int) # Convert to int
+    # logging.debug('pixelArray int {}'.format(pixelArray))
+
+    if debugItL: debug(time.perf_counter(), '- Convert to int')
+    # logging.debug('pixelArray {}'.format(pixelArray))
     pixelTuple=[tuple(x) for x in pixelArray] #Convert to correctly dimensioned tuple array
+    # logging.debug('pixelTuple {}'.format(pixelTuple))
+    if debugItL: debug(time.perf_counter(), '- Convert to tuple array') 
     pixels[:]=pixelTuple
+    # logging.debug('pixels {}'.format(pixels))
+    if debugItL: debug(time.perf_counter(), '- assign to pixels') 
         
     return pixels
 
+
+def debug(newtime, msg):
+    global comparetime
+    logging.debug('{}: ({}) {}'.format(newtime, round(newtime-comparetime, 2), msg))
+    comparetime = newtime
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -110,13 +129,34 @@ sleep(1) #allow the camera to warm up
 camera.capture(rawCapture,format="rgb",use_video_port=True) #Capture image
 rawCapture.truncate(0) #Clear buffer for next frame capture
 
+comparetime = time.perf_counter()
+oldtime = time.perf_counter()
+fpsCounter = 0
+
+debugMain = False
+debugItL = False
+
 while 1:
+    if debugMain: debug(time.perf_counter(), '-') 
     camera.capture(rawCapture,format="rgb",use_video_port=True) #Capture image
+    if debugMain: debug(time.perf_counter(), 'capture')
     newImage=rawCapture.array #Retrieve array of captured image as array
+    if debugMain: debug(time.perf_counter(), 'array')
     newImageROI = extractROI(newImage,windowSize)
-    discretizedImage=discretizeImage(newImageROI,noLevels) #Discretize image and scale values  
+    if debugMain: debug(time.perf_counter(), 'roi')
+    discretizedImage=discretizeImage(newImageROI,noLevels) #Discretize image and scale values 
+    if debugMain: debug(time.perf_counter(), 'discretize') 
     pixels=imageToLED(discretizedImage,pixels) #Convert the image to an LED value array and assign them to the string of Neopixels
+    if debugMain: debug(time.perf_counter(), 'imageToLED') 
     pixels.show() #Light up the LEDs
+    if debugMain: debug(time.perf_counter(), 'show') 
     rawCapture.truncate(0) #Clear stream to prepare for next frame
+    fpsCounter += 1
+    newtime = time.perf_counter()
+    if (newtime - oldtime > 1):
+        logging.debug('{} fps from {} until {}'.format(fpsCounter, oldtime, newtime))
+        oldtime = newtime
+        fpsCounter = 0
+
 
 camera.close()
