@@ -29,7 +29,7 @@ def extractROI(image,windowSize):
     roiImage=image[x_startIdx:x_endIdx,y_startIdx:y_endIdx,:]
 
     # roiImage=image[:windowSize[0],:windowSize[1],:]     # get as many columns and lines out of image as defined in windowSize
-    logging.debug('extractROI image {} ... roiImage {} ... windowSize{}'.format(len(image), len(roiImage), windowSize)) 
+    # logging.debug('extractROI image {} ... roiImage {} ... windowSize{}'.format(len(image), len(roiImage), windowSize)) 
     # logging.debug('extractROI image {} ... roiImage {} ... windowSize{}'.format(image[:1], roiImage[:2], windowSize)) 
     return roiImage
 
@@ -64,21 +64,22 @@ def imageToLED(discreteImageRaw,pixels):
     if debugItL: debug(time.perf_counter(), '- 2') 
 
     # logging.debug('{} / pixelArray {}'.format(len(discreteImage), pixelArray))
-
     # logging.debug('x {}'.format(time.perf_counter()))
     # logging.debug('imageToLED pixelArray[0] {}'.format(pixelArray[0]))
     # logging.debug('imageToLED \n--- len(pixelArray) {}\n--- pixelArray[0] {}'.format(len(pixelArray), pixelArray[0]))
 
     pixelArray=pixelArray.astype(int) # Convert to int
     # logging.debug('pixelArray int {}'.format(pixelArray))
-
     if debugItL: debug(time.perf_counter(), '- Convert to int')
     # logging.debug('pixelArray {}'.format(pixelArray))
-    pixelTuple=[tuple(x) for x in pixelArray] #Convert to correctly dimensioned tuple array
+
+    # pixelTuple=[tuple(x) for x in pixelArray] # Convert to correctly dimensioned tuple array
     # logging.debug('pixelTuple {}'.format(pixelTuple))
-    if debugItL: debug(time.perf_counter(), '- Convert to tuple array') 
-    pixels[:]=pixelTuple
-    # logging.debug('pixels {}'.format(pixels))
+    # if debugItL: debug(time.perf_counter(), '- Convert to tuple array') 
+
+    # pixels[:]=pixelTuple    # add every single tuple element into pixels (of type NeoPixel) on level 1 (each one are the colors of a pixel)
+    pixels[:]=pixelArray    # add every single array element into pixels (of type NeoPixel) on level 1 (each one are the colors of a pixel)
+    # logging.debug('pixels {} / pixelArray {}'.format(pixels, pixelArray))
     if debugItL: debug(time.perf_counter(), '- assign to pixels') 
         
     return pixels
@@ -95,11 +96,11 @@ logging.basicConfig(level=logging.DEBUG)
 xImageRes=50 #Desired x resolution of captured image
 yImageRes=50 #120 #Desired y resolution of captured image
 noLevels=255 #No of LED brightness discretization levels
-numNeopixels_x = 40 #Declare number of Neopixels in grid
-numNeopixels_y = 30
+numNeopixels_x = 6 #Declare number of Neopixels in grid
+numNeopixels_y = 50
 windowSize=(numNeopixels_x,numNeopixels_y) #Define extracted ROI size
-xCenter=67#70 #x center location of ROI
-yCenter=75#71 #y center location of ROI
+# xCenter=67#70 #x center location of ROI
+# yCenter=75#71 #y center location of ROI
 thresh=50 #Threshold value for background subtraction
 threshLower=0
 threshUpper=200
