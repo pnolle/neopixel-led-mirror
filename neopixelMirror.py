@@ -20,7 +20,17 @@ import time
 import logging
 
 def extractROI(image,windowSize):
-    roiImage=image[:windowSize[0],:windowSize[1],:]
+    global xImageRes
+    global yImageRes
+    x_startIdx=int(xImageRes/2-windowSize[0]/2)
+    y_startIdx=int(yImageRes/2-windowSize[1]/2)
+    x_endIdx=int(xImageRes/2+windowSize[0]/2)
+    y_endIdx=int(yImageRes/2+windowSize[1]/2)
+    roiImage=image[x_startIdx:x_endIdx,y_startIdx:y_endIdx,:]
+
+    # roiImage=image[:windowSize[0],:windowSize[1],:]     # get as many columns and lines out of image as defined in windowSize
+    logging.debug('extractROI image {} ... roiImage {} ... windowSize{}'.format(len(image), len(roiImage), windowSize)) 
+    # logging.debug('extractROI image {} ... roiImage {} ... windowSize{}'.format(image[:1], roiImage[:2], windowSize)) 
     return roiImage
 
 
@@ -85,8 +95,8 @@ logging.basicConfig(level=logging.DEBUG)
 xImageRes=50 #Desired x resolution of captured image
 yImageRes=50 #120 #Desired y resolution of captured image
 noLevels=255 #No of LED brightness discretization levels
-numNeopixels_x = 50 #Declare number of Neopixels in grid
-numNeopixels_y = 50
+numNeopixels_x = 40 #Declare number of Neopixels in grid
+numNeopixels_y = 30
 windowSize=(numNeopixels_x,numNeopixels_y) #Define extracted ROI size
 xCenter=67#70 #x center location of ROI
 yCenter=75#71 #y center location of ROI
